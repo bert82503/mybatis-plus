@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Properties;
 
 /**
+ * 内部拦截器
  * @author miemie
  * @since 3.4.0
  */
@@ -50,7 +51,8 @@ public interface InnerInterceptor {
      * @param boundSql      boundSql
      * @return 新的 boundSql
      */
-    default boolean willDoQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    default boolean willDoQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
+            throws SQLException {
         return true;
     }
 
@@ -79,7 +81,8 @@ public interface InnerInterceptor {
      * @param ms        MappedStatement
      * @param parameter parameter
      */
-    default boolean willDoUpdate(Executor executor, MappedStatement ms, Object parameter) throws SQLException {
+    default boolean willDoUpdate(Executor executor, MappedStatement ms, Object parameter)
+            throws SQLException {
         return true;
     }
 
