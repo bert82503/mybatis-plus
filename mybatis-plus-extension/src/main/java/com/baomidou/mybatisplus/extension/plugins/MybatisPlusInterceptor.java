@@ -34,6 +34,7 @@ import java.sql.Connection;
 import java.util.*;
 
 /**
+ * 拦截器
  * @author miemie
  * @since 3.4.0
  */
@@ -50,36 +51,51 @@ import java.util.*;
 public class MybatisPlusInterceptor implements Interceptor {
 
     @Setter
-    private List<InnerInterceptor> interceptors = new ArrayList<>();
+    private List<InnerInterceptor> interceptors = new ArrayList<>(10);
 
+    /**
+     * 拦截调用，并返回结果
+     * @param invocation 调用会话
+     * @return 调用结果
+     * @throws Throwable 异常
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object target = invocation.getTarget();
         Object[] args = invocation.getArgs();
         if (target instanceof Executor) {
+            // SQL执行器
             final Executor executor = (Executor) target;
             Object parameter = args[1];
             boolean isUpdate = args.length == 2;
+            // 映射语句
             MappedStatement ms = (MappedStatement) args[0];
             if (!isUpdate && ms.getSqlCommandType() == SqlCommandType.SELECT) {
+                // 行范围
                 RowBounds rowBounds = (RowBounds) args[2];
+                // 结果处理器
                 ResultHandler resultHandler = (ResultHandler) args[3];
+                // 绑定后的SQL
                 BoundSql boundSql;
                 if (args.length == 4) {
                     boundSql = ms.getBoundSql(parameter);
                 } else {
-                    // 几乎不可能走进这里面,除非使用Executor的代理对象调用query[args[6]]
+                    // 几乎不可能走进这里面，除非使用Executor的代理对象调用query[args[6]]
                     boundSql = (BoundSql) args[5];
                 }
+                // 查询拦截器列表
                 for (InnerInterceptor query : interceptors) {
                     if (!query.willDoQuery(executor, ms, parameter, rowBounds, resultHandler, boundSql)) {
                         return Collections.emptyList();
                     }
                     query.beforeQuery(executor, ms, parameter, rowBounds, resultHandler, boundSql);
                 }
+                // 缓存键
                 CacheKey cacheKey = executor.createCacheKey(ms, parameter, rowBounds, boundSql);
+                // 执行查询语句
                 return executor.query(ms, parameter, rowBounds, resultHandler, cacheKey, boundSql);
             } else if (isUpdate) {
+                // 更新拦截器列表
                 for (InnerInterceptor update : interceptors) {
                     if (!update.willDoUpdate(executor, ms, parameter)) {
                         return -1;
@@ -88,27 +104,32 @@ public class MybatisPlusInterceptor implements Interceptor {
                 }
             }
         } else {
-            // StatementHandler
+            // StatementHandler-语句处理器
             final StatementHandler sh = (StatementHandler) target;
             // 目前只有StatementHandler.getBoundSql方法args才为null
             if (null == args) {
+                // 绑定后的SQL拦截器列表
                 for (InnerInterceptor innerInterceptor : interceptors) {
                     innerInterceptor.beforeGetBoundSql(sh);
                 }
             } else {
+                // SQL执行链接
                 Connection connections = (Connection) args[0];
                 Integer transactionTimeout = (Integer) args[1];
+                // SQL执行拦截器列表
                 for (InnerInterceptor innerInterceptor : interceptors) {
                     innerInterceptor.beforePrepare(sh, connections, transactionTimeout);
                 }
             }
         }
+        // 方法调用
         return invocation.proceed();
     }
 
     @Override
     public Object plugin(Object target) {
         if (target instanceof Executor || target instanceof StatementHandler) {
+            // 基于插件的反射调用处理器
             return Plugin.wrap(target, this);
         }
         return target;
