@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * MybatisPlus 支持的数据库类型,主要用于分页方言
+ * MybatisPlus 支持的数据库类型，主要用于分页方言
  *
  * @author hubin
  * @since 2018-06-23
@@ -72,6 +72,7 @@ public enum DbType {
      * SQLSERVER
      */
     SQL_SERVER("sqlserver", "SQLServer数据库"),
+    // 国产数据库
     /**
      * DM
      */
@@ -104,20 +105,6 @@ public enum DbType {
      * GBase-8s
      */
     GBASE_8S("gbase-8s", "南大通用数据库 GBase 8s"),
-    /**
-     * use {@link  #GBASE_8S}
-     *
-     * @deprecated 2022-05-30
-     */
-    @Deprecated
-    GBASEDBT("gbasedbt", "南大通用数据库"),
-    /**
-     * use {@link  #GBASE_8S}
-     *
-     * @deprecated 2022-05-30
-     */
-    @Deprecated
-    GBASE_INFORMIX("gbase 8s", "南大通用数据库 GBase 8s"),
     /**
      * Oscar
      */
