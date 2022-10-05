@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 /**
  * 分页拦截器
  * <p>
- * 默认对 left join 进行优化,虽然能优化count,但是加上分页的话如果1对多本身结果条数就是不正确的
+ * 默认对 left join 进行优化，虽然能优化count，但是加上分页的话如果1对多本身结果条数就是不正确的
  *
  * @author hubin
  * @since 3.4.0
@@ -110,15 +110,18 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
     }
 
     /**
-     * 这里进行count,如果count为0这返回false(就是不再执行sql了)
+     * 这里进行count，如果count为0这返回false(就是不再执行sql了)
      */
     @Override
-    public boolean willDoQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    public boolean willDoQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
+            throws SQLException {
+        // 分页对象
         IPage<?> page = ParameterUtils.findPage(parameter).orElse(null);
         if (page == null || page.getSize() < 0 || !page.searchCount()) {
             return true;
         }
 
+        // 统计记录数的SQL
         BoundSql countSql;
         MappedStatement countMs = buildCountMappedStatement(ms, page.countId());
         if (countMs != null) {
@@ -132,6 +135,7 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
         }
 
         CacheKey cacheKey = executor.createCacheKey(countMs, parameter, rowBounds, countSql);
+        // 执行查询
         List<Object> result = executor.query(countMs, parameter, rowBounds, resultHandler, cacheKey, countSql);
         long total = 0;
         if (CollectionUtils.isNotEmpty(result)) {
@@ -141,12 +145,15 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
                 total = Long.parseLong(o.toString());
             }
         }
+        // 记录行数
         page.setTotal(total);
         return continuePage(page);
     }
 
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
+            throws SQLException {
+        // 分页对象
         IPage<?> page = ParameterUtils.findPage(parameter).orElse(null);
         if (null == page) {
             return;
