@@ -38,7 +38,7 @@ public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        /**
+        /*
          * 命令行中获取密钥
          */
         String mpwKey = null;
@@ -49,11 +49,11 @@ public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
                 break;
             }
         }
-        /**
+        /*
          * 处理加密内容
          */
         if (StringUtils.isNotBlank(mpwKey)) {
-            HashMap<String, Object> map = new HashMap<>();
+            HashMap<String, Object> map = new HashMap<>(16);
             for (PropertySource<?> ps : environment.getPropertySources()) {
                 if (ps instanceof OriginTrackedMapPropertySource) {
                     OriginTrackedMapPropertySource source = (OriginTrackedMapPropertySource) ps;

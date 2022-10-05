@@ -417,7 +417,7 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
         return originalSql;
     }
 
-    protected List<OrderByElement> addOrderByElements(List<OrderItem> orderList, List<OrderByElement> orderByElements) {
+    protected static List<OrderByElement> addOrderByElements(List<OrderItem> orderList, List<OrderByElement> orderByElements) {
         List<OrderByElement> additionalOrderBy = orderList.stream()
             .filter(item -> StringUtils.isNotBlank(item.getColumn()))
             .map(item -> {
@@ -426,7 +426,8 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
                 element.setAsc(item.isAsc());
                 element.setAscDescPresent(true);
                 return element;
-            }).collect(Collectors.toList());
+            })
+            .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(orderByElements)) {
             return additionalOrderBy;
         }
