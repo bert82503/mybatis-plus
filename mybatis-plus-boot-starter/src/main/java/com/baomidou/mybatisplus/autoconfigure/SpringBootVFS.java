@@ -15,7 +15,6 @@
  */
 package com.baomidou.mybatisplus.autoconfigure;
 
-
 import org.apache.ibatis.io.VFS;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -35,6 +34,9 @@ import java.util.stream.Stream;
  */
 public class SpringBootVFS extends VFS {
 
+    /**
+     * 资源解析器
+     */
     private final ResourcePatternResolver resourceResolver;
 
     public SpringBootVFS() {
