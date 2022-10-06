@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /**
+ * 自动配置启动器
  * Spring Boot Stater
  */
 package com.baomidou.mybatisplus.autoconfigure;

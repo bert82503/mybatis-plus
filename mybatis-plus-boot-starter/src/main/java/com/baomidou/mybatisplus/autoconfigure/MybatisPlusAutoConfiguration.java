@@ -15,7 +15,6 @@
  */
 package com.baomidou.mybatisplus.autoconfigure;
 
-
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.JoinTableInfoInitHandler;
@@ -77,6 +76,7 @@ import java.util.stream.Stream;
 /**
  * {@link EnableAutoConfiguration Auto-Configuration} for Mybatis. Contributes a
  * {@link SqlSessionFactory} and a {@link SqlSessionTemplate}.
+ * 自动配置
  * <p>
  * If {@link org.mybatis.spring.annotation.MapperScan} is used, or a
  * configuration file is specified as a property, those will be considered,
@@ -99,14 +99,26 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusAutoConfiguration.class);
 
+    /**
+     * 配置属性
+     */
     private final MybatisPlusProperties properties;
 
+    /**
+     * 拦截器列表
+     */
     private final Interceptor[] interceptors;
 
+    /**
+     * 类型处理器列表
+     */
     private final TypeHandler[] typeHandlers;
 
     private final LanguageDriver[] languageDrivers;
 
+    /**
+     * 资源加载器
+     */
     private final ResourceLoader resourceLoader;
 
     private final DatabaseIdProvider databaseIdProvider;
@@ -117,6 +129,9 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     private final List<MybatisPlusPropertiesCustomizer> mybatisPlusPropertiesCustomizers;
 
+    /**
+     * 应用上下文
+     */
     private final ApplicationContext applicationContext;
 
     public MybatisPlusAutoConfiguration(MybatisPlusProperties properties,
@@ -310,12 +325,16 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
                 packages.forEach(pkg -> logger.debug("Using auto-configuration base package '{}'", pkg));
             }
 
+            // 映射器扫描器配置器
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
             builder.addPropertyValue("processPropertyPlaceHolders", true);
+            // @Mapper
             builder.addPropertyValue("annotationClass", Mapper.class);
+            // 基本包路径
             builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(packages));
             BeanWrapper beanWrapper = new BeanWrapperImpl(MapperScannerConfigurer.class);
-            Set<String> propertyNames = Stream.of(beanWrapper.getPropertyDescriptors()).map(PropertyDescriptor::getName)
+            Set<String> propertyNames = Stream.of(beanWrapper.getPropertyDescriptors())
+                .map(PropertyDescriptor::getName)
                 .collect(Collectors.toSet());
             if (propertyNames.contains("lazyInitialization")) {
                 // Need to mybatis-spring 2.0.2+
@@ -345,6 +364,8 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
             }
             builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
+            // 映射器扫描器配置器
+            // 注册bean定义
             registry.registerBeanDefinition(MapperScannerConfigurer.class.getName(), builder.getBeanDefinition());
         }
 
