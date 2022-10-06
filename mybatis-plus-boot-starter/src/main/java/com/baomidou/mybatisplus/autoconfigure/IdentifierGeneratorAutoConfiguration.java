@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 /**
+ * Id生成器自动配置
+ *
  * @author nieqiurong 2021/1/29
  * @since 3.4.3
  */
@@ -39,6 +41,7 @@ public class IdentifierGeneratorAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         public IdentifierGenerator identifierGenerator(InetUtils inetUtils) {
+            // 默认的Id生成器
             return new DefaultIdentifierGenerator(inetUtils.findFirstNonLoopbackAddress());
         }
     }
