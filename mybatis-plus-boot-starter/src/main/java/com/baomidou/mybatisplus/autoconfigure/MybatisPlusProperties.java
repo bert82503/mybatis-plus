@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 
 /**
  * Configuration properties for MyBatis.
+ * 配置属性
  *
  * @author Eddú Meléndez
  * @author Kazuki Shimizu
@@ -45,15 +46,20 @@ import java.util.stream.Stream;
 @ConfigurationProperties(prefix = Constants.MYBATIS_PLUS)
 public class MybatisPlusProperties {
 
+    /**
+     * 资源解析器
+     */
     private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
     /**
      * Location of MyBatis xml config file.
+     * xml配置文件的位置。
      */
     private String configLocation;
 
     /**
      * Locations of MyBatis mapper files.
+     * 映射器文件的位置。
      *
      * @since 3.1.2 add default value
      */
@@ -61,6 +67,7 @@ public class MybatisPlusProperties {
 
     /**
      * Packages to search type aliases. (Package delimiters are ",; \t\n")
+     * 搜索类型别名的包路径列表。
      */
     private String typeAliasesPackage;
 
@@ -72,6 +79,7 @@ public class MybatisPlusProperties {
 
     /**
      * Packages to search for type handlers. (Package delimiters are ",; \t\n")
+     * 搜索类型处理器的包路径列表。
      */
     private String typeHandlersPackage;
 
@@ -94,6 +102,7 @@ public class MybatisPlusProperties {
 
     /**
      * Externalized properties for MyBatis configuration.
+     * 配置的外部化属性。
      */
     private Properties configurationProperties;
 
@@ -101,6 +110,7 @@ public class MybatisPlusProperties {
      * A Configuration object for customize default settings. If {@link #configLocation}
      * is specified, this property is not used.
      * TODO 使用 MybatisConfiguration
+     * 用于自定义默认设置的配置对象。
      */
     @NestedConfigurationProperty
     private MybatisConfiguration configuration;
@@ -121,8 +131,10 @@ public class MybatisPlusProperties {
 
 
     public Resource[] resolveMapperLocations() {
-        return Stream.of(Optional.ofNullable(this.mapperLocations).orElse(new String[0]))
-            .flatMap(location -> Stream.of(getResources(location))).toArray(Resource[]::new);
+        return Stream.of(Optional.ofNullable(this.mapperLocations)
+            .orElse(new String[0]))
+            .flatMap(location -> Stream.of(getResources(location)))
+            .toArray(Resource[]::new);
     }
 
     private Resource[] getResources(String location) {
