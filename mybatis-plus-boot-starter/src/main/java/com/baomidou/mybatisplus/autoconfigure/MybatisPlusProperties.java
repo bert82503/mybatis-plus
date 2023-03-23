@@ -49,11 +49,10 @@ public class MybatisPlusProperties {
     /**
      * 资源解析器
      */
-    private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+    private static final ResourcePatternResolver RESOURCE_RESOLVER = new PathMatchingResourcePatternResolver();
 
     /**
      * Location of MyBatis xml config file.
-     * xml配置文件的位置。
      */
     private String configLocation;
 
@@ -67,7 +66,6 @@ public class MybatisPlusProperties {
 
     /**
      * Packages to search type aliases. (Package delimiters are ",; \t\n")
-     * 搜索类型别名的包路径列表。
      */
     private String typeAliasesPackage;
 
@@ -139,7 +137,7 @@ public class MybatisPlusProperties {
 
     private Resource[] getResources(String location) {
         try {
-            return resourceResolver.getResources(location);
+            return RESOURCE_RESOLVER.getResources(location);
         } catch (IOException e) {
             return new Resource[0];
         }
