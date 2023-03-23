@@ -33,6 +33,7 @@ import java.util.HashMap;
  *
  * @author hubin
  * @since 2020-05-23
+ * @see org.springframework.boot.env.EnvironmentPostProcessor
  */
 public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
 
@@ -49,29 +50,32 @@ public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
                 break;
             }
         }
+        if (StringUtils.isBlank(mpwKey)) {
+            return;
+        }
         /*
          * 处理加密内容
          */
-        if (StringUtils.isNotBlank(mpwKey)) {
-            HashMap<String, Object> map = new HashMap<>(16);
-            for (PropertySource<?> ps : environment.getPropertySources()) {
-                if (ps instanceof OriginTrackedMapPropertySource) {
-                    OriginTrackedMapPropertySource source = (OriginTrackedMapPropertySource) ps;
-                    for (String name : source.getPropertyNames()) {
-                        Object value = source.getProperty(name);
-                        if (value instanceof String) {
-                            String str = (String) value;
-                            if (str.startsWith("mpw:")) {
-                                map.put(name, AES.decrypt(str.substring(4), mpwKey));
-                            }
+        HashMap<String, Object> map = new HashMap<>(16);
+        for (PropertySource<?> ps : environment.getPropertySources()) {
+            if (ps instanceof OriginTrackedMapPropertySource) {
+                OriginTrackedMapPropertySource source = (OriginTrackedMapPropertySource) ps;
+                for (String name : source.getPropertyNames()) {
+                    Object value = source.getProperty(name);
+                    if (value instanceof String) {
+                        String str = (String) value;
+                        if (str.startsWith("mpw:")) {
+                            // 解密
+                            map.put(name, AES.decrypt(str.substring(4), mpwKey));
                         }
                     }
                 }
             }
-            // 将解密的数据放入环境变量，并处于第一优先级上
-            if (CollectionUtils.isNotEmpty(map)) {
-                environment.getPropertySources().addFirst(new MapPropertySource("custom-encrypt", map));
-            }
+        }
+        // 将解密的数据放入环境变量，并处于第一优先级上
+        if (CollectionUtils.isNotEmpty(map)) {
+            environment.getPropertySources()
+                .addFirst(new MapPropertySource("custom-encrypt", map));
         }
     }
 }
