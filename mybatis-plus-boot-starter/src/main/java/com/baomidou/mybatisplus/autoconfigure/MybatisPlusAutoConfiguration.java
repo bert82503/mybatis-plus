@@ -112,7 +112,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
     /**
      * 类型处理器列表
      */
-    private final TypeHandler[] typeHandlers;
+    private final TypeHandler<?>[] typeHandlers;
 
     private final LanguageDriver[] languageDrivers;
 
@@ -136,7 +136,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
     public MybatisPlusAutoConfiguration(MybatisPlusProperties properties,
                                         ObjectProvider<Interceptor[]> interceptorsProvider,
-                                        ObjectProvider<TypeHandler[]> typeHandlersProvider,
+                                        ObjectProvider<TypeHandler<?>[]> typeHandlersProvider,
                                         ObjectProvider<LanguageDriver[]> languageDriversProvider,
                                         ResourceLoader resourceLoader,
                                         ObjectProvider<DatabaseIdProvider> databaseIdProvider,
@@ -159,8 +159,9 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         if (!CollectionUtils.isEmpty(mybatisPlusPropertiesCustomizers)) {
-            mybatisPlusPropertiesCustomizers.forEach(i -> i.customize(properties));
+            mybatisPlusPropertiesCustomizers.forEach(pc -> pc.customize(properties));
         }
+        // 检查配置文件是否存在
         checkConfigFileExists();
     }
 
@@ -221,7 +222,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
 
         // TODO 此处必为非 NULL
         GlobalConfig globalConfig = this.properties.getGlobalConfig();
-        // TODO 注入填充器
+        // 注入填充器
         this.getBeanThen(MetaObjectHandler.class, globalConfig::setMetaObjectHandler);
         // TODO 注入参与器
         this.getBeanThen(JoinTableInfoInitHandler.class, globalConfig::setJoinTableInfoInitHandler);
