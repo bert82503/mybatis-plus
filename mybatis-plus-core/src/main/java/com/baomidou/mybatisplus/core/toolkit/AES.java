@@ -21,7 +21,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
@@ -30,7 +29,7 @@ import java.util.Base64;
  * @author hubin
  * @since 2020-05-23
  */
-public class AES {
+public final class AES {
 
     /**
      * 加密
@@ -42,8 +41,8 @@ public class AES {
     public static byte[] encrypt(byte[] data, byte[] key) {
         try {
             SecretKeySpec secretKey = new SecretKeySpec(key, Constants.AES);
-            byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, Constants.AES);
+            byte[] encodeFormat = secretKey.getEncoded();
+            SecretKeySpec secretKeySpec = new SecretKeySpec(encodeFormat, Constants.AES);
             Cipher cipher = Cipher.getInstance(Constants.AES_CBC_CIPHER);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(key));
             return cipher.doFinal(data);
@@ -62,8 +61,8 @@ public class AES {
     public static byte[] decrypt(byte[] data, byte[] key) {
         try {
             SecretKeySpec secretKey = new SecretKeySpec(key, Constants.AES);
-            byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, Constants.AES);
+            byte[] encodeFormat = secretKey.getEncoded();
+            SecretKeySpec secretKeySpec = new SecretKeySpec(encodeFormat, Constants.AES);
             Cipher cipher = Cipher.getInstance(Constants.AES_CBC_CIPHER);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(key));
             return cipher.doFinal(data);
@@ -92,16 +91,15 @@ public class AES {
      * @return
      */
     public static String decrypt(String data, String key) {
-        byte[] originalData = Base64.getDecoder().decode(data.getBytes());
+        byte[] originalData = Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
         byte[] valueByte = decrypt(originalData, key.getBytes(StandardCharsets.UTF_8));
-        return new String(valueByte);
+        return new String(valueByte, StandardCharsets.UTF_8);
     }
 
     /**
      * 生成一个随机字符串密钥
      *
      * @return
-     * @throws NoSuchAlgorithmException
      */
     public static String generateRandomKey() {
         return IdWorker.get32UUID().substring(0, 16);

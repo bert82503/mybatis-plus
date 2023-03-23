@@ -20,6 +20,7 @@ package com.baomidou.mybatisplus.core.exceptions;
  *
  * @author hubin
  * @since 2016-01-23
+ * @see java.lang.RuntimeException
  */
 public class MybatisPlusException extends RuntimeException {
 
